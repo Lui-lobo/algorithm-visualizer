@@ -1,15 +1,18 @@
-import React from "react";
-
 interface BarProps {
   height: number;
-  isActive?: boolean;
+  color?: string; // Tailwind color class
 }
 
-export const Bar: React.FC<BarProps> = ({ height, isActive }) => (
-  <div
-    className={`w-2 rounded-sm ${
-      isActive ? "bg-indigo-400" : "bg-gray-600"
-    } transition-all duration-100 ease-in-out`}
-    style={{ height: `${height * 3}px` }}
-  ></div>
-);
+export const Bar: React.FC<BarProps> = ({ height, color }) => {
+  return (
+    <div
+      className={`
+        w-4 
+        ${color ?? "bg-indigo-400"}
+        rounded-t
+        transition-all duration-75
+      `}
+      style={{ height: `${height * 3}px` }}
+    ></div>
+  );
+};

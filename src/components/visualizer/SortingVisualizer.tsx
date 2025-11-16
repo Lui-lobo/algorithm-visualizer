@@ -9,7 +9,9 @@ export const SortingVisualizer: React.FC = () => {
   const [size, setSize] = useState(20);
   const [speed, setSpeed] = useState(100);
 
-  const [steps, setSteps] = useState<number[][]>([]);
+  const [steps, setSteps] = useState<
+    { array: number[]; compare: number[]; swap: number[] }[]
+  >([]);
   const [currentStep, setCurrentStep] = useState(0);
 
   const [isSorting, setIsSorting] = useState(false);
@@ -59,18 +61,12 @@ export const SortingVisualizer: React.FC = () => {
   }
 
   function prepareAlgorithm(arr: number[]) {
-    // Prepare recorded states from generator
     const generator = bubbleSort(arr);
-    const states: number[][] = [];
+    const states: { array: number[]; compare: number[]; swap: number[] }[] = [];
 
     for (let res = generator.next(); !res.done; res = generator.next()) {
-      // guard against undefined yields
       if (res.value) states.push(res.value);
     }
-
-    // Ensure final state exists
-    if (states.length === 0) states.push([...arr]);
-    else states.push(states[states.length - 1]);
 
     return states;
   }
@@ -168,6 +164,9 @@ export const SortingVisualizer: React.FC = () => {
     });
   }
 
+  const state = steps[currentStep];
+  const displayedArray = state ? state.array : array; // fallback for initial render
+
   return (
     <div className="flex flex-col items-center gap-6 mt-10">
       <SortingControls
@@ -190,9 +189,19 @@ export const SortingVisualizer: React.FC = () => {
       />
 
       <div className="flex items-end justify-center gap-1 h-[350px] w-full max-w-4xl bg-gray-800 rounded-lg p-4 shadow-lg">
-        {array.map((value, idx) => (
-          <Bar key={idx} height={value} />
-        ))}
+        {displayedArray.map((value, idx) => {
+          let color = "bg-indigo-400";
+
+          if (state) {
+            if (state.swap?.includes(idx)) {
+              color = "bg-red-500";
+            } else if (state.compare?.includes(idx)) {
+              color = "bg-yellow-400";
+            }
+          }
+
+          return <Bar key={idx} height={value} color={color} />;
+        })}
       </div>
     </div>
   );
